@@ -1,33 +1,19 @@
 package utils
 
-import(
-	"os"
+import (
 	"path/filepath"
+	"os"
 )
-
-type Job struct {
-	ID           string
-	URL          string
-	Format       string
-	VolumeScale  string
-	StartTime    string
-	EndTime      string
-	ResponseChan chan Result
-}
-
-type Result struct {
-	OutputPath  string
-	Err         error
-}
 
 func Worker(id int, jobs <-chan Job) {
 	for job := range jobs {
 		println("Worker: ", id, "... Started Job: ", job.ID)
-		process(id, job)
+		Process(id, job)
 	}
 }
 
-func process(id int, job Job) {
+func Process(id int, job Job) {
+	if isCanceled(job) { return }
 	err := dlp(
 		job.ID+".mp4", // file name
 		job.URL,
@@ -37,6 +23,7 @@ func process(id int, job Job) {
 		job.ResponseChan <- Result{"", err}
 		return
 	}
+	if isCanceled(job) { return }
 	err = ffmpeg(
 		job.ID+".mp4", // input_file_name = job id + .mp4 
 		job.ID, // output_base
@@ -54,3 +41,16 @@ func process(id int, job Job) {
 	job.ResponseChan <- Result{outPath, nil}
 	close(job.ResponseChan)
 }
+
+func isCanceled(job Job) bool {
+	select {
+	case <-job.Context.Done():
+		// context expired or canceled
+		job.ResponseChan <- Result{"", job.Context.Err()}
+		close(job.ResponseChan)
+		return true
+	default:
+		return false
+	}
+}
+
