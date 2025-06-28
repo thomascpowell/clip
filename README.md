@@ -1,2 +1,1 @@
-### API for clipping YouTube videos.
-(using yt-dlp and ffmpeg)
+In development: An API for clipping YouTube videos
