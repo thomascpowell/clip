@@ -2,12 +2,14 @@ package utils
 
 import (
 	"path/filepath"
-	"os"
+	"time"
+	"fmt"
 )
 
 func Worker(id int, jobs <-chan Job) {
 	for job := range jobs {
-		println("Worker: ", id, "... Started Job: ", job.ID)
+		log := fmt.Sprintf("[%s] Worker %d / Job ID %s", time.Now().Format("15:04:05.000"), id, job.ID)
+		fmt.Println(log)
 		Process(id, job)
 	}
 }
@@ -21,6 +23,7 @@ func Process(id int, job Job) {
 	if err != nil {
 		println("Worker: ", id, "... Error in dlp(): ", err.Error())
 		job.ResponseChan <- Result{"", err}
+		close(job.ResponseChan)
 		return
 	}
 	if isCanceled(job) { return }
@@ -35,9 +38,11 @@ func Process(id int, job Job) {
 	if err != nil {
 		println("Worker: ", id, "... Error in ffmpeg(): ", err.Error())
 		job.ResponseChan <- Result{"", err}
+		close(job.ResponseChan)
 		return
 	}
-	outPath := filepath.Join(os.TempDir(), "out_" + job.ID + "." + job.Format)
+	if isCanceled(job) { return }
+	outPath := filepath.Join(GetDir(), "out_" + job.ID + "." + job.Format)
 	job.ResponseChan <- Result{outPath, nil}
 	close(job.ResponseChan)
 }

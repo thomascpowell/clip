@@ -8,6 +8,7 @@ import (
 const WORKER_COUNT = 2
 
 func main() {
+	utils.MakeDirectory()
 	jobs := make(chan utils.Job, WORKER_COUNT) 
 
 	for i := range WORKER_COUNT {
@@ -23,28 +24,13 @@ func main() {
 		EndTime:     "00:00:20",
 	}
 
-	job2 := utils.Job{
-		ID:          "test2",
-		URL:         "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-		Format:      "mp4",
-		VolumeScale: "1",
-		StartTime:   "00:00:00",
-		EndTime:     "00:00:20",
-	}
+	results := make(chan utils.Result, 2)
 
-	result1 := utils.StartJob(jobs, job1)
-	result2 := utils.StartJob(jobs, job2)
+	go func() {
+    results <- utils.StartJob(jobs, job1)
+	}()
 
-	if result1.Err != nil {
-		fmt.Println("job1 failed:", result1.Err)
-	} else {
-		fmt.Println("success: ", result1.OutputPath)
-	}
-
-	if result2.Err != nil {
-		fmt.Println("job2 failed:", result2.Err)
-	} else {
-		fmt.Println("success: ", result2.OutputPath)
-	}
-
+	res1 := <-results
+	
+	fmt.Println("Result 1:", res1.OutputPath)
 }
