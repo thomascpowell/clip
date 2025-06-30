@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/google/uuid"
 	"video-api/utils"
 	"fmt"
 )
@@ -16,7 +17,7 @@ func main() {
 	}
 
 	job1 := utils.Job{
-		ID:          "test1",
+		ID:          uuid.New().String(),
 		URL:         "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 		Format:      "mp3",
 		VolumeScale: "1.5",
