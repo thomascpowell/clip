@@ -1,1 +1,1 @@
-In development: An API for clipping YouTube videos.
+In development (slowly): An API for clipping YouTube videos.
