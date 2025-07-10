@@ -13,6 +13,7 @@ func StartJob(jobs chan Job, job Job) Result {
 	jobs <- job
 	select {
 	case result := <-job.ResponseChan:
+		// write status here?
 		return result
 	case <-ctx.Done():
 		return Result{"", ctx.Err()}

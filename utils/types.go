@@ -19,3 +19,13 @@ type Result struct {
 	OutputPath  string
 	Err         error
 }
+
+// WIP
+// figuring out how to store job status
+type JobStatus string
+const (
+	StatusQueued     JobStatus = "queued"
+	StatusProcessing JobStatus = "processing"
+	StatusDone       JobStatus = "done"
+	StatusError      JobStatus = "error"
+)
