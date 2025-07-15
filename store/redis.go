@@ -21,6 +21,15 @@ func jobKey(id string) string {
 	return jobKeyPrefix+id
 }
 
+func hsetWithTTL(key string, values map[string]any) error {
+	ctx, cancel := withTimeout()
+	defer cancel()
+	if err := rdb.HSet(ctx, key, values).Err(); err != nil {
+		return err
+	}
+	return rdb.Expire(ctx, key, ttl).Err()
+}
+
 // start redis on a provided address
 func InitRedis(addr string) error {
 	ctx, cancel := withTimeout()
@@ -32,22 +41,23 @@ func InitRedis(addr string) error {
 	return err
 }
 
-func StoreJob(id string) error {
-	ctx, cancel := withTimeout()
-	defer cancel()
-	return rdb.Set(ctx, jobKey(id), utils.StatusQueued, ttl).Err()
+func StoreJob(id, format string) error {
+	return hsetWithTTL(jobKey(id), map[string]any{
+		"status": utils.StatusQueued,
+		"format": format,
+	})
 }
 
 func UpdateJobStatus(id string, status utils.JobStatus) error {
-	ctx, cancel := withTimeout()
-	defer cancel()
-	return rdb.Set(ctx, jobKey(id), status, ttl).Err()
+	return hsetWithTTL(jobKey(id), map[string]any{
+		"status": status,
+	})
 }
 
 func GetJobStatus(id string) (utils.JobStatus, error) {
 	ctx, cancel := withTimeout()
 	defer cancel()
-	status, err := rdb.Get(ctx, jobKey(id)).Result()
+	status, err := rdb.HGet(ctx, jobKey(id), "status").Result()
 	if err == redis.Nil {
     return "", fmt.Errorf("job not found")
 	}
@@ -59,3 +69,19 @@ func DeleteJob(id string) error {
 	defer cancel()
 	return rdb.Del(ctx, jobKey(id)).Err()
 }
+
+func GetStatusAndFormat(id string) (utils.JobStatus, string, error) {
+	ctx, cancel := withTimeout()
+	defer cancel()
+	result, err := rdb.HMGet(ctx, jobKey(id), "status", "format").Result()
+	if err != nil {
+		return "", "", err
+	}
+	status := result[0]
+  format := result[1]
+	if status == nil || format == nil {
+		return "", "", fmt.Errorf("missing job fields")
+	}
+	return utils.JobStatus(status.(string)), format.(string), nil
+}
+

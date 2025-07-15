@@ -25,12 +25,7 @@ func HandlePostVideo(jobs chan utils.Job) gin.HandlerFunc {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to queue job"})
 			return
 		}
-
-
-		// send to job queue
-		utils.StartJob(jobs, job)
-
-
+		utils.StartJob(jobs, job) // sends to job queue
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "job accepted",
 			"id":      job.ID,
@@ -38,6 +33,27 @@ func HandlePostVideo(jobs chan utils.Job) gin.HandlerFunc {
 	}
 }
 
-func HandleGetVideo() error {
-	return nil
+func HandleGetVideo(ctx *gin.Context) {
+	id := ctx.Param("id")
+	status, err := store.GetJobStatus(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "job not found"})
+		return
+	}
+
+	switch status {
+	case utils.StatusDone	
+		outputPath := filepath.Join(utils.GetDir(), "out_" + id + "." +)
+		ctx.File(outputPath):
+	case utils.StatusError:
+	case utils.StatusQueued:
+	case utils.StatusProcessing:
+		
+
+
+
+
+
+
+	}
 }

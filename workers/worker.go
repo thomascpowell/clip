@@ -5,13 +5,12 @@ import (
 	"video-api/store"
 	"path/filepath"
 	"time"
-	"fmt"
+	"log"
 )
 
 func Worker(id int, jobs <-chan utils.Job) {
 	for job := range jobs {
-		log := fmt.Sprintf("[%s] Worker %d / utils.Job ID %s", time.Now().Format("15:04:05.000"), id, job.ID)
-		fmt.Println(log)
+		log.Printf("[%s] Worker %d / utils.Job ID %s", time.Now().Format("15:04:05.000"), id, job.ID)
 		Process(id, job)
 	}
 }
@@ -24,7 +23,7 @@ func Process(id int, job utils.Job) {
 		job.URL,
 	)
 	if err != nil {
-		println("Worker: ", id, "... Error in dlp(): ", err.Error())
+		log.Printf("Worker: ", id, "... Error in dlp(): ", err.Error())
 		job.ResponseChan <- utils.Result{
 			OutputPath: "", 
 			Err: err,
@@ -42,7 +41,7 @@ func Process(id int, job utils.Job) {
 		job.EndTime,
 	)
 	if err != nil {
-		println("Worker: ", id, "... Error in ffmpeg(): ", err.Error())
+		log.Printf("Worker: ", id, "... Error in ffmpeg(): ", err.Error())
 		job.ResponseChan <- utils.Result{
 			OutputPath: "", 
 			Err: err,
