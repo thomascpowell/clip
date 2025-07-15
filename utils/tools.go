@@ -18,7 +18,7 @@ import(
 * base:      e.g. video
 */
 
-func dlp(output_file_name string, url string) error {
+func Dlp(output_file_name string, url string) error {
 	directory := GetDir()
 	path := filepath.Join(directory, output_file_name)
 	cmd := exec.Command("yt-dlp", 
@@ -32,7 +32,7 @@ func dlp(output_file_name string, url string) error {
 	return cmd.Run()
 }
 
-func ffmpeg(input_file_name string, output_base string, output_format string, volume_scale string, start_time string, end_time string) error {
+func FFmpeg(input_file_name string, output_base string, output_format string, volume_scale string, start_time string, end_time string) error {
 	directory := GetDir()
 	input_path := filepath.Join(directory, input_file_name)
 	output_path := filepath.Join(directory, "out_"+output_base+ "." + output_format)

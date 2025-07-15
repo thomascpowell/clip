@@ -4,15 +4,15 @@ import(
 	"context"
 )
 
-type Job struct {       	
-	Context      context.Context
-	ID           string
-	URL          string
-	Format       string
-	VolumeScale  string
-	StartTime    string
-	EndTime      string
-	ResponseChan chan Result
+type Job struct {
+	Context      context.Context `json:"-"`
+	ID           string          `json:"-"`
+	URL          string          `json:"url" binding:"required"`
+	Format       string          `json:"format"`
+	VolumeScale  string          `json:"volumeScale"`
+	StartTime    string          `json:"startTime"`
+	EndTime      string          `json:"endTime"`
+	ResponseChan chan Result     `json:"-"`
 }
 
 type Result struct {
