@@ -54,16 +54,6 @@ func UpdateJobStatus(id string, status utils.JobStatus) error {
 	})
 }
 
-func GetJobStatus(id string) (utils.JobStatus, error) {
-	ctx, cancel := withTimeout()
-	defer cancel()
-	status, err := rdb.HGet(ctx, jobKey(id), "status").Result()
-	if err == redis.Nil {
-    return "", fmt.Errorf("job not found")
-	}
-	return utils.JobStatus(status), err
-}
-
 func DeleteJob(id string) error {
 	ctx, cancel := withTimeout()
 	defer cancel()
