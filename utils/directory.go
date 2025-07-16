@@ -3,7 +3,6 @@ package utils
 import (
 	"os"
 	"fmt"
-	"path/filepath"
 )
 
 func MakeDirectory() {
@@ -15,6 +14,5 @@ func MakeDirectory() {
 }
 
 func GetDir() string {
-	tmp := os.TempDir()
-	return filepath.Join(tmp, "video_api_tmp")
+    return "/app/videos"
 }

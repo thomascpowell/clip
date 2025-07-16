@@ -5,6 +5,7 @@ import (
 	"context"
 	"video-api/utils"
 	"time"
+	"log"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -42,15 +43,19 @@ func InitRedis(addr string) error {
 }
 
 func StoreJob(id, format string) error {
-	return hsetWithTTL(jobKey(id), map[string]any{
-		"status": utils.StatusQueued,
+	err := hsetWithTTL(jobKey(id), map[string]any{
+		"status": string(utils.StatusQueued),
 		"format": format,
 	})
+	if err != nil {
+		log.Printf("Error storing job %s: %v", id, err)
+	}
+	return err
 }
 
 func UpdateJobStatus(id string, status utils.JobStatus) error {
 	return hsetWithTTL(jobKey(id), map[string]any{
-		"status": status,
+		"status": string(status),
 	})
 }
 
