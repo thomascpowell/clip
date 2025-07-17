@@ -2,8 +2,9 @@
 .env
 
 # notes
-todo
+notes
 
-# program outputs
+# program outputs from testing
+video/
 *.mp4
 *.mp3
