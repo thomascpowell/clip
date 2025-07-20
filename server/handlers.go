@@ -2,7 +2,9 @@ package server
 
 import(
 	"path/filepath"
+	"context"
 	"video-api/utils"
+	"video-api/workers"
 	"video-api/store"
 	"net/http"
 	"github.com/gin-gonic/gin"
@@ -17,13 +19,16 @@ func HandlePostVideo(jobs chan utils.Job) gin.HandlerFunc {
 			return
 		}
 		job.ID = uuid.New().String()
-		job.Context = ctx.Request.Context()
+		// job.Context = ctx.Request.Context()
+		job.Context = context.Background()
 		job.ResponseChan = make(chan utils.Result)
 		if err := store.StoreJob(job.ID, job.Format); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to queue job"})
 			return
 		}
-		utils.StartJob(jobs, job) // sends to job queue
+		go func() {
+			workers.StartJob(jobs, job)
+		}()
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "job accepted",
 			"id":      job.ID,

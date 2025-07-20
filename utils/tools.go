@@ -69,7 +69,6 @@ func FFmpeg(input_file_name string, output_base string, output_format string, vo
 	// cmd.Stderr = &stderr
 	// cmd.Stdout = os.Stdout
 	// cmd.Stderr = os.Stderr
-
 	defer os.Remove(input_path)
 	return cmd.Run()
 }

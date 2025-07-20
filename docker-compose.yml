@@ -19,3 +19,4 @@ services:
       - ./videos:/app/videos
     environment:
       - REDIS_ADDR=redis:6379
+      - FRONTEND_URL=http://localhost:5173
