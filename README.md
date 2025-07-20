@@ -14,6 +14,3 @@
 ### Planned:
 - Frontend written in Svelte
 - Tweaks to get "production ready"
-
-### Libraries:
-- Uses `yt-dlp` and `ffmpeg`
