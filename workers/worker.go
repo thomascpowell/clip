@@ -1,8 +1,8 @@
 package workers
 
 import (
-	"video-api/utils"
-	"video-api/store"
+	"clip-api/utils"
+	"clip-api/store"
 	"path/filepath"
 	"time"
 	"log"

@@ -3,9 +3,9 @@ package server
 import(
 	"path/filepath"
 	"context"
-	"video-api/utils"
-	"video-api/workers"
-	"video-api/store"
+	"clip-api/utils"
+	"clip-api/workers"
+	"clip-api/store"
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

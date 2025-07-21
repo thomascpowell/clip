@@ -1,7 +1,7 @@
 package workers
 
 import (
-	"video-api/utils"
+	"clip-api/utils"
 	"context"
 	"time"
 )

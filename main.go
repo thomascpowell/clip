@@ -1,10 +1,10 @@
 package main
 
 import(
-	"video-api/store"
-	"video-api/utils"
-	"video-api/workers"
-	"video-api/server"
+	"clip-api/store"
+	"clip-api/utils"
+	"clip-api/workers"
+	"clip-api/server"
 	"log"
 	"os"
 )

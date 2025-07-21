@@ -3,7 +3,7 @@ package store
 import (
 	"fmt"
 	"context"
-	"video-api/utils"
+	"clip-api/utils"
 	"time"
 	"log"
 	"github.com/redis/go-redis/v9"

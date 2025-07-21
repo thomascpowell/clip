@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"video-api/utils"
+	"clip-api/utils"
 	"github.com/gin-contrib/cors"
 	"time"
 	"os"
