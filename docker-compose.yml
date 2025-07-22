@@ -15,8 +15,8 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
-    volumes:
-      - ./videos:/app/videos
+    volumes: []
+      # - ./videos:/app/videos
     environment:
       - REDIS_ADDR=redis:6379
       - FRONTEND_URL=http://localhost:5173
