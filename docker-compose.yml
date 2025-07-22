@@ -16,7 +16,18 @@ services:
     ports:
       - "8080:8080"
     volumes: []
-      # - ./videos:/app/videos
     environment:
       - REDIS_ADDR=redis:6379
       - FRONTEND_URL=http://localhost:5173
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    environment:
+      - ENV=local
+      - DOMAIN=localhost
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro

@@ -9,7 +9,7 @@ import(
 	"os"
 )
 
-const WORKER_COUNT = 4
+const WORKER_COUNT = 2
 
 func main() {
 	address := os.Getenv("REDIS_ADDR")

@@ -4,13 +4,12 @@ import (
 	"clip-api/utils"
 	"clip-api/store"
 	"path/filepath"
-	"time"
 	"log"
 )
 
 func Worker(id int, jobs <-chan utils.Job) {
 	for job := range jobs {
-		log.Printf("[%s] Worker %d / utils.Job ID %s", time.Now().Format("15:04:05.000"), id, job.ID)
+		log.Printf("Worker %d ... Started job", id)
 		Process(id, job)
 	}
 }
@@ -23,7 +22,7 @@ func Process(id int, job utils.Job) {
 		job.URL,
 	)
 	if err != nil {
-		log.Printf("Worker: ", id, "... Error in dlp(): ", err.Error())
+		log.Printf("Worker %d ... Error in dlp(): %v", id, err)
 		job.ResponseChan <- utils.Result{
 			OutputPath: "", 
 			Err: err,
@@ -41,7 +40,7 @@ func Process(id int, job utils.Job) {
 		job.EndTime,
 	)
 	if err != nil {
-		log.Printf("Worker: ", id, "... Error in ffmpeg(): ", err.Error())
+		log.Printf("Worker %d ... Error in ffmpeg(): %v", id, err)
 		job.ResponseChan <- utils.Result{
 			OutputPath: "", 
 			Err: err,
@@ -52,6 +51,7 @@ func Process(id int, job utils.Job) {
 	if abortIfCanceled(job) { return }
 	outPath := filepath.Join(utils.GetDir(), "out_" + job.ID + "." + job.Format)
 	store.UpdateJobStatus(job.ID, utils.StatusDone)
+	log.Printf(":Worker %d ... Finished job", id)
 	job.ResponseChan <- utils.Result{
 		OutputPath: outPath, 
 		Err: err,
