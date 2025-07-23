@@ -15,7 +15,7 @@ func Worker(id int, jobs <-chan utils.Job) {
 }
 
 func Process(id int, job utils.Job) {
-	if abortIfCanceled(job) { return }
+	if abortIfCanceled(id, job) { return }
 	store.UpdateJobStatus(job.ID, utils.StatusProcessing)
 	err := utils.Dlp(
 		job.ID+".mp4", // file name
@@ -23,6 +23,7 @@ func Process(id int, job utils.Job) {
 	)
 	if err != nil {
 		log.Printf("Worker %d ... Error in dlp(): %v", id, err)
+		store.UpdateJobStatus(job.ID, utils.StatusError)
 		job.ResponseChan <- utils.Result{
 			OutputPath: "", 
 			Err: err,
@@ -30,7 +31,7 @@ func Process(id int, job utils.Job) {
 		close(job.ResponseChan)
 		return
 	}
-	if abortIfCanceled(job) { return }
+	if abortIfCanceled(id, job) { return }
 	err = utils.FFmpeg(
 		job.ID+".mp4", // input_file_name = job id + .mp4 
 		job.ID, // output_base
@@ -41,6 +42,7 @@ func Process(id int, job utils.Job) {
 	)
 	if err != nil {
 		log.Printf("Worker %d ... Error in ffmpeg(): %v", id, err)
+		store.UpdateJobStatus(job.ID, utils.StatusError)
 		job.ResponseChan <- utils.Result{
 			OutputPath: "", 
 			Err: err,
@@ -48,7 +50,7 @@ func Process(id int, job utils.Job) {
 		close(job.ResponseChan)
 		return
 	}
-	if abortIfCanceled(job) { return }
+	if abortIfCanceled(id, job) { return }
 	outPath := filepath.Join(utils.GetDir(), "out_" + job.ID + "." + job.Format)
 	store.UpdateJobStatus(job.ID, utils.StatusDone)
 	log.Printf("Worker %d ... Finished job", id)
@@ -59,7 +61,7 @@ func Process(id int, job utils.Job) {
 	close(job.ResponseChan)
 }
 
-func abortIfCanceled(job utils.Job) bool {
+func abortIfCanceled(id int, job utils.Job) bool {
 	select {
 	case <-job.Context.Done():
 		// context expired or canceled
@@ -67,6 +69,7 @@ func abortIfCanceled(job utils.Job) bool {
 			OutputPath: "",
 			Err: job.Context.Err(),
 		}
+		log.Printf("Worker %d ... Canceled job", id)
 		close(job.ResponseChan)
 		store.UpdateJobStatus(job.ID, utils.StatusError)
 		return true
