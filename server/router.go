@@ -22,5 +22,6 @@ func SetupRouter(jobs chan utils.Job) *gin.Engine {
 
 	router.POST("/videos", HandlePostVideo(jobs))
 	router.GET("/videos/:id", HandleGetVideo)
+	router.GET("/status/:id", HandleGetStatus)
 	return router
 }

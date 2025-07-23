@@ -19,6 +19,7 @@ services:
     environment:
       - REDIS_ADDR=redis:6379
       - FRONTEND_URL=http://localhost:5173
+      - DOMAIN=localhost
   nginx:
     build: ./nginx
     ports:

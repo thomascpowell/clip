@@ -3,6 +3,7 @@ package server
 import(
 	"path/filepath"
 	"context"
+	"os"
 	"clip-api/utils"
 	"clip-api/workers"
 	"clip-api/store"
@@ -19,7 +20,6 @@ func HandlePostVideo(jobs chan utils.Job) gin.HandlerFunc {
 			return
 		}
 		job.ID = uuid.New().String()
-		// job.Context = ctx.Request.Context()
 		job.Context = context.Background()
 		job.ResponseChan = make(chan utils.Result)
 		if err := store.StoreJob(job.ID, job.Format); err != nil {
@@ -31,7 +31,7 @@ func HandlePostVideo(jobs chan utils.Job) gin.HandlerFunc {
 		}()
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "job accepted",
-			"id":      job.ID,
+			"id": job.ID,
 		})
 	}
 }
@@ -39,18 +39,31 @@ func HandlePostVideo(jobs chan utils.Job) gin.HandlerFunc {
 func HandleGetVideo(ctx *gin.Context) {
 	id := ctx.Param("id")
 	status, format, err := store.GetStatusAndFormat(id)
+	if status != utils.StatusDone || err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "404"})
+		return
+	}
+	outputName := "out_" + id + "." + format
+	outputPath := filepath.Join(utils.GetDir(), outputName)
+	ctx.Header("Content-Disposition", "attachment; filename="+outputName)
+	ctx.File(outputPath)
+}
+
+func HandleGetStatus(ctx *gin.Context) {
+	id := ctx.Param("id")
+	status, _, err := store.GetStatusAndFormat(id)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "job not found"})
 		return
 	}
 	switch status {
 	case utils.StatusDone:
-		outputPath := filepath.Join(utils.GetDir(), "out_" + id + "." + format)
-		ctx.File(outputPath)
+		outputPath := os.Getenv("DOMAIN") + "/videos/" + id
+		ctx.JSON(http.StatusAccepted, gin.H{"url": outputPath})
 	case utils.StatusError:
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "job failed or was canceled"})
 	case utils.StatusQueued, utils.StatusProcessing:
-		ctx.JSON(http.StatusAccepted, gin.H{"message": "job is still processing"})
+		ctx.JSON(http.StatusOK, gin.H{"message": "job is still processing"})
 	default:
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "unknown job status"})
 	}
