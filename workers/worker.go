@@ -51,7 +51,7 @@ func Process(id int, job utils.Job) {
 	if abortIfCanceled(job) { return }
 	outPath := filepath.Join(utils.GetDir(), "out_" + job.ID + "." + job.Format)
 	store.UpdateJobStatus(job.ID, utils.StatusDone)
-	log.Printf(":Worker %d ... Finished job", id)
+	log.Printf("Worker %d ... Finished job", id)
 	job.ResponseChan <- utils.Result{
 		OutputPath: outPath, 
 		Err: err,
