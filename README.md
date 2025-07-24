@@ -18,5 +18,5 @@
 - Nginx: Reverse proxy
 
 ### Notes:
-- A fully-featured SvelteKit frontend for this project: [clip-fe](https://github.com/thomascpowell/clip-fe).
+- A fully-featured SvelteKit frontend for this project: [clip-fe](https://github.com/thomascpowell/clip-fe)
 - The frontend supports self-hosting, since I don't currently provide a hosted backend
