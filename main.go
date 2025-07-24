@@ -14,7 +14,7 @@ const WORKER_COUNT = 2
 func main() {
 	address := os.Getenv("REDIS_ADDR")
 	if address == "" {
-    log.Fatal("REDIS_ADDR env var is empty")
+		log.Fatal("REDIS_ADDR env var is empty")
 	}
 	if err := store.InitRedis(address); err != nil {
 		log.Fatalf("Error starting Redis: %v", err)
