@@ -18,7 +18,7 @@ services:
     volumes: []
     environment:
       - REDIS_ADDR=redis:6379
-      - FRONTEND_URL=http://localhost:5173
+      - FRONTEND_URL=http://localhost:5173 
       - DOMAIN=localhost
   nginx:
     build: ./nginx
@@ -28,7 +28,8 @@ services:
     depends_on:
       - api
     environment:
-      - ENV=local
+      - ENV=local # local | prod
       - DOMAIN=localhost
     volumes:
+      # in prod only: nginx looks here for certs
       - /etc/letsencrypt:/etc/letsencrypt:ro
