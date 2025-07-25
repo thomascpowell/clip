@@ -77,4 +77,3 @@ func abortIfCanceled(id int, job utils.Job) bool {
 		return false
 	}
 }
-
